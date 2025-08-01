@@ -1,32 +1,36 @@
 package edu.sharif.selab.services;
 
+import edu.sharif.selab.models.Message;
 import edu.sharif.selab.models.EmailMessage;
-import edu.sharif.selab.models.SmsMessage;
-import edu.sharif.selab.models.TelegramMessage;
 
 import java.util.regex.Pattern;
 
-public class EmailMessageService implements MessageService{
+public class EmailMessageService implements EmailMessageSender {
+    
     @Override
-    public void sendSmsMessage(SmsMessage smsMessage) {
-        //Empty Body
+    public void send(Message message) {
+        if (message instanceof EmailMessage) {
+            sendEmail((EmailMessage) message);
+        } else {
+            throw new IllegalArgumentException("This service can only handle Email messages");
+        }
+    }
+    
+    @Override
+    public boolean canHandle(Message message) {
+        return message instanceof EmailMessage;
     }
 
     @Override
-    public void sendTelegramMessage(TelegramMessage telegramMessage) {
-        //Empty Body
-    }
-
-    @Override
-    public void sendEmailMessage(EmailMessage emailMessage) {
+    public void sendEmail(EmailMessage emailMessage) {
         if(validateEmailAddress(emailMessage.getSourceEmailAddress()) && validateEmailAddress(emailMessage.getTargetEmailAddress())){
-            System.out.println("Sending a SMS from " + emailMessage.getSourceEmailAddress() + " to " + emailMessage.getTargetEmailAddress() + " with content : " + emailMessage.getContent());
+            System.out.println("Sending an Email from " + emailMessage.getSourceEmailAddress() + " to " + emailMessage.getTargetEmailAddress() + " with content : " + emailMessage.getContent());
         }else{
             throw new IllegalArgumentException("Email Address is Not Correct!");
         }
     }
 
-    public boolean validateEmailAddress(String email) {
+    private boolean validateEmailAddress(String email) {
         // Regular expression pattern for validating email addresses
         String emailRegex = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
 

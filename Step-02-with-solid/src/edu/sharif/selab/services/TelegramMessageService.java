@@ -1,22 +1,26 @@
 package edu.sharif.selab.services;
 
-import edu.sharif.selab.models.EmailMessage;
-import edu.sharif.selab.models.SmsMessage;
+import edu.sharif.selab.models.Message;
 import edu.sharif.selab.models.TelegramMessage;
 
-public class TelegramMessageService implements MessageService {
+public class TelegramMessageService implements TelegramMessageSender {
+    
     @Override
-    public void sendSmsMessage(SmsMessage smsMessage) {
-        //Empty Body
+    public void send(Message message) {
+        if (message instanceof TelegramMessage) {
+            sendTelegram((TelegramMessage) message);
+        } else {
+            throw new IllegalArgumentException("This service can only handle Telegram messages");
+        }
+    }
+    
+    @Override
+    public boolean canHandle(Message message) {
+        return message instanceof TelegramMessage;
     }
 
     @Override
-    public void sendEmailMessage(EmailMessage emailMessage) {
-        //Empty Body
-    }
-
-    @Override
-    public void sendTelegramMessage(TelegramMessage telegramMessage) {
+    public void sendTelegram(TelegramMessage telegramMessage) {
         if (validateTelegramId(telegramMessage.getSourceId()) && validateTelegramId(telegramMessage.getTargetId())) {
             System.out.println("Sending a Telegram message from " + telegramMessage.getSourceId() + 
                              " to " + telegramMessage.getTargetId() + 
